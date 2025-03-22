@@ -1,0 +1,8 @@
+[theme]
+primaryColor = "#FFD700"  # Bright Gold (Symbolizing CSK & KKR's Glory)
+backgroundColor = "#1A0028"  # Very Deep Purple (Majestic, Royal)
+secondaryBackgroundColor = "#33004E"  # Dark Violet (Powerful, Luxurious)
+textColor = "#FFD700"  # Golden (CSK/KKR)
+
+# Stylish, bold sports font
+font = "monospace"
