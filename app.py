@@ -121,4 +121,4 @@ elif menu == "Season Data":
 st.sidebar.markdown("---")
 st.sidebar.markdown("### Developed by:")
 st.sidebar.markdown("👨‍💻 Anurag Ghosh  \n👨‍💻 Uttam Mahata  \n👩‍💻 Suchana Hazra  \n👨‍💻 Siddhart Sen")
-st.sidebar.markdown("[GitHub Repository](https://github.com/your-repo-link)")
+st.sidebar.markdown("[GitHub Repository](https://github.com/Anurag-ghosh-12/ipl)")
