@@ -5,6 +5,57 @@ import time
 import matplotlib.pyplot as plt
 import os
 
+# Page configuration
+st.set_page_config(
+    page_title="IPL Data Analysis & Prediction",
+    page_icon="🏏",
+    layout="wide"
+)
+
+# CSS styles (your existing styles here)
+st.markdown(
+    """
+    <style>
+    .stButton > button {
+        width: 100%;
+        text-align: center;
+        display: block;
+        margin-bottom: 10px;
+        background-color: #1b0b61;
+        font-family: monospace;
+    }
+     .github-button {
+        display: block;
+        width: 100%;
+        text-align: center;
+        background-color: #022e15;
+        color: #d3f5c6; /* Yellow text */
+        font-family: monospace;
+        font-size: 16px;
+        padding: 10px;
+        border-radius: 5px;
+        text-decoration: none;
+        font-weight: bold;
+        margin-bottom: 10px;
+        border: 2px solid #d3f5c6; /* Border to prevent shifting */
+    }
+    .github-button:hover {
+        background-color: yellow; /* Yellow background */
+        color: #022e15; /* Deep Red text */
+        border: 2px solid #022e15; /* Deep Red border */
+    }
+    a.github-button:visited, a.github-button:active {
+        color: yellow !important;
+        text-decoration: none !important;
+    }
+    a.github-button:hover {
+        color: black !important;
+    }
+    </style>
+    """,
+    unsafe_allow_html=True,
+)
+
 # Define Teams
 teams = [
     "Royal Challengers Bangalore", "Kings XI Punjab", "Mumbai Indians", "Kolkata Knight Riders",
@@ -22,12 +73,36 @@ cities = [
 # Load Model
 pipe = pickle.load(open('ipl.pkl', 'rb'))
 
-# Sidebar Navigation
-st.sidebar.title("🏏 IPL Win Predictor")
-menu = st.sidebar.radio("Navigation", ["Prediction Page", "IPL Seasonal Trends", "Seasonal Detailed Analysis", "Cap Winners", "Bowler Statistics"])
+# Initialize session state for page navigation
+if 'current_page' not in st.session_state:
+    st.session_state['current_page'] = 'home'
 
-# General Info & Prediction Page
-if menu == "Prediction Page":
+st.sidebar.title("Welcome to IPL Dataverse:")
+# Sidebar Navigation
+st.sidebar.image("ipl_logo.JPG", use_container_width=True)
+st.sidebar.write("Navigation Guide:")
+
+# Navigation buttons
+if st.sidebar.button("Predict the Winner!"):
+    st.session_state['current_page'] = 'prediction'
+
+if st.sidebar.button("IPL Seasonal Trends"):
+    st.session_state['current_page'] = 'seasonal_trends'
+
+if st.sidebar.button("Seasonal Detailed Analysis"):
+    st.session_state['current_page'] = 'seasonal_detailed'
+
+if st.sidebar.button("Cap Winners"):
+    st.session_state['current_page'] = 'cap_winners'
+
+if st.sidebar.button("Bowler Statistics"):
+    st.session_state['current_page'] = 'bowler_stats'
+
+if st.sidebar.button("Batsman Statistics"):
+    st.session_state['current_page'] = 'batsman_stats'
+
+# Handle different pages based on session state
+if st.session_state['current_page'] == 'prediction':
     st.title("🏏 IPL Win Probability Predictor")
 
     st.write("""
@@ -105,8 +180,7 @@ if menu == "Prediction Page":
         # Show Pie Chart in Streamlit
         st.pyplot(fig)
 
-# Season Data Section
-elif menu == "IPL Seasonal Trends":
+elif st.session_state['current_page'] == 'seasonal_trends':
     st.title("📊 IPL Seasonwise Analysis")
 
     st.subheader("Average Runs per match")
@@ -124,7 +198,47 @@ elif menu == "IPL Seasonal Trends":
     st.subheader("Number of times a target of 200+ was scored")
     st.image("targets_200_plus.png", use_container_width=True)
 
-elif menu == "Cap Winners":
+elif st.session_state['current_page'] == 'seasonal_detailed':
+    st.title("📊 Welcome to IPL Seasonal Analysis")
+    st.write("""
+    Over the past 17 years, IPL has provided some of the most thrilling moments in cricket history. 
+    We have analyzed an extensive amount of historical data to bring these trends and insights to you. 
+    Explore the various statistics across different seasons and uncover the hidden patterns of IPL.
+    """)
+    
+    # Read available seasons from the folder
+    seasons = [f"{year}" for year in range(2008, 2025)]  # IPL seasons from 2008 to 2024
+    selected_season = st.selectbox("Select IPL Season", seasons)
+    
+    # Define categories for analysis
+    categories = [
+        "Average Score", "Matches Per Stadium", "Top Players",
+        "Toss Decisions", "Total Runs", "Win Margins", "Wins By Team"
+    ]
+    
+    selected_category = st.selectbox("Select Analysis Category", categories)
+    
+    # Convert category name to filename format
+    category_filename = selected_category.lower().replace(" ", "_")
+    image_path = f"ipl_season_plots/{selected_season}_{category_filename}.png"
+    
+    # Display analysis and image
+    st.subheader(f"IPL {selected_season} - {selected_category} Analysis")
+    st.write("""
+    Below is a detailed visualization of how teams performed in the selected category for this season.
+    These insights help us understand how the game evolved and how different factors played a role in team success.
+    """)
+    
+    if os.path.exists(image_path):
+        st.image(image_path, use_container_width=True)
+    else:
+        st.warning("No visualization available for this selection.")
+    
+    st.write("""
+    Stay tuned for more updates and deep dives into IPL's historical trends!
+    """)
+
+elif st.session_state['current_page'] == 'cap_winners':
     st.title("🏆 IPL Cap Winners - Orange & Purple Cap")
     st.write("""
     The **Orange Cap** is awarded to the highest run-scorer in a season, while the **Purple Cap** is given to the leading wicket-taker.
@@ -173,8 +287,7 @@ elif menu == "Cap Winners":
     purple_cap_df = pd.DataFrame(purple_cap_data)
     st.table(purple_cap_df)
 
-
-elif menu == "Bowler Statistics":
+elif st.session_state['current_page'] == 'bowler_stats':
     st.title("🎯 Top Bowler Stats in IPL")
     st.write("This is the bowling statistics for the last 5 IPL seasons and the first-ever IPL season.")
 
@@ -214,48 +327,66 @@ elif menu == "Bowler Statistics":
         image_path = f"logo_footer.jpg"
         st.image(image_path, use_container_width=True)
 
-elif menu == "Seasonal Detailed Analysis":
-    st.title("📊 Welcome to IPL Seasonal Analysis")
-    st.write("""
-    Over the past 17 years, IPL has provided some of the most thrilling moments in cricket history. 
-    We have analyzed an extensive amount of historical data to bring these trends and insights to you. 
-    Explore the various statistics across different seasons and uncover the hidden patterns of IPL.
-    """)
-    
-    # Read available seasons from the folder
-    seasons = [f"{year}" for year in range(2008, 2025)]  # IPL seasons from 2008 to 2024
-    selected_season = st.selectbox("Select IPL Season", seasons)
-    
-    # Define categories for analysis
-    categories = [
-        "Average Score", "Matches Per Stadium", "Top Players",
-        "Toss Decisions", "Total Runs", "Win Margins", "Wins By Team"
-    ]
-    
-    selected_category = st.selectbox("Select Analysis Category", categories)
-    
-    # Convert category name to filename format
-    category_filename = selected_category.lower().replace(" ", "_")
-    image_path = f"ipl_season_plots/{selected_season}_{category_filename}.png"
-    
-    # Display analysis and image
-    st.subheader(f"IPL {selected_season} - {selected_category} Analysis")
-    st.write("""
-    Below is a detailed visualization of how teams performed in the selected category for this season.
-    These insights help us understand how the game evolved and how different factors played a role in team success.
-    """)
-    
-    if os.path.exists(image_path):
-        st.image(image_path, use_container_width=True)
-    else:
-        st.warning("No visualization available for this selection.")
-    
-    st.write("""
-    Stay tuned for more updates and deep dives into IPL's historical trends!
-    """)
+elif st.session_state['current_page'] == 'batsman_stats':
+    st.title("🎯 Top Batsman Stats in IPL")
+    st.write("## Experienced batsmen stats for all the seasons of IPL.")
+    st.image("exp_batsman_runstrikerate.png", use_container_width=True)
+
+    st.write("## Top Individual Scores of all the seasons of IPL.")
+    st.image("highest_individual_batter.png", use_container_width=True)
+
+else:
+    # Home page - this is what shows when no button is clicked
+    st.markdown(
+        "<h1 style='text-align: center; color: yellow;'>🏏 IPL Data Analysis & Prediction</h1>",
+        unsafe_allow_html=True
+    )
+
+    # Insert IPL logo
+    st.image("ipl_body.png", use_container_width=True)
+    st.write(
+        """
+        The **Indian Premier League (IPL)**, founded in 2008 by the BCCI, is the most-watched 
+        T20 cricket league globally. It features top players from around the world and has transformed 
+        cricket with its electrifying matches and record-breaking performances.
+        
+        The IPL consists of **10 teams** representing various cities in India. The current teams are:
+        - 🏆 Kolkata Knight Riders (KKR) -2024 Winner
+        - 🔵 Mumbai Indians (MI)
+        - 🔴 Royal Challengers Bangalore (RCB)
+        - 🟡 Chennai Super Kings (CSK)
+        - 🟠 Sunrisers Hyderabad (SRH)
+        - 🔴 Punjab Kings (PBKS)
+        - 🟡 Gujarat Titans (GT)
+        - 🟢 Lucknow Super Giants (LSG)
+        - 🟠 Rajasthan Royals (RR)
+        - 🔵 Delhi Capitals (DC)
+
+        Our platform provides **in-depth analysis** of all IPL seasons (2008-2024), 
+        including match trends, player statistics, team performances, and a **prediction model** 
+        for the 2025 season.
+        """
+    )
 
 # Sidebar Footer
 st.sidebar.markdown("---")
-st.sidebar.markdown("### Developed by:")
-st.sidebar.markdown("👨‍💻 Anurag Ghosh  \n👨‍💻 Uttam Mahata  \n👩‍💻 Suchana Hazra  \n👨‍💻 Siddhart Sen")
-st.sidebar.markdown("[GitHub Repository](https://github.com/Anurag-ghosh-12/ipl)")
+st.sidebar.markdown(
+    """
+    <div style="text-align: center;">
+        <h3>Developed by:</h3>
+        👨‍💻 <a href="https://github.com/Anurag-ghosh-12" target="_blank" style="text-decoration: none; color: white;">Anurag Ghosh</a>  <br>
+        👨‍💻 <a href="https://github.com/Uttam-Mahata" target="_blank" style="text-decoration: none; color: white;">Uttam Mahata</a>  <br>
+        👩‍💻 <a href="https://github.com/Suchana4Hazra" target="_blank" style="text-decoration: none; color: white;">Suchana Hazra</a>  <br>
+        👨‍💻 <a href="https://github.com/Sidhupaji-2004" target="_blank" style="text-decoration: none; color: white;">Siddharth Sen</a>  <br>
+        <br>
+    </div>
+    """,
+    unsafe_allow_html=True
+)
+
+st.sidebar.markdown(
+    '<a class="github-button" href="https://github.com/Anurag-ghosh-12/ipl" target="_blank">GitHub Repository</a>',
+    unsafe_allow_html=True,
+)
+st.markdown("---")
+st.markdown("IPL Dataverse | ©Gradient Geeks | Created with Streamlit 👑")
