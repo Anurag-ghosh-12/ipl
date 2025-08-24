@@ -1,12 +1,4 @@
-# BrainDead 🧠 2K25:
-
-![BrainDead Logo](https://github.com/user-attachments/assets/db36aa27-72f8-4fd6-9de6-18f1c4b4c8f6)
-
-# BrainDead 🧠: The Ultimate Data Analysis & Machine Learning Challenge
-
----
-
-# Problem Statement 1: Statistics is All You Need: IPL Data Analysis and 2025 Winner Prediction – The Game Behind the Game!
+# Objective: Statistics is All You Need: IPL Data Analysis and 2025 Winner Prediction – The Game Behind the Game!
 
 #### <div align="right">🎯 Marks: 40</div>
 
